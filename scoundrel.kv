@@ -1,0 +1,55 @@
+#:kivy 1.4
+
+<ScoundrelGame>:    
+    rows: 6
+    Label:
+        text: ""
+        size_hint: None, .2
+    Label:
+        size_hint: 1, .25
+        font_size: 70  
+        text: "SCOUNDREL"
+    AnchorLayout:
+        anchor_x: "center"
+        size_hint: 1, .1
+        GridLayout:
+            size_hint: .2, .8
+            rows: 4
+            cols: 2
+            Label:
+                text: "Health"
+            Label:
+                text: "20/20"
+            Label:
+                text: "Weapon"
+            Label:
+                text: "None"
+            Label:
+                text: "Deck"
+            Label:
+                text: "44"
+    AnchorLayout:
+        anchor_x: "center"
+        size_hint: 1, .5
+        GridLayout:
+            size_hint: .5, .8
+            rows: 1
+            cols: 4
+            Button:
+                text: "c1"
+            Button:
+                text: "c1"
+            Button:
+                text: "c1"
+            Button:
+                text: "c1"
+    AnchorLayout:
+        anchor_x: "center"
+        size_hint: 1, .1
+        Button:
+            size_hint: .1, .5
+            text: "Run!"
+    Label:
+        size_hint: None, .2
+        text: ""
+
