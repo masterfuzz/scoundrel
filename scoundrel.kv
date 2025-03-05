@@ -19,14 +19,17 @@
             Label:
                 text: "Health"
             Label:
+                id: health
                 text: "20/20"
             Label:
                 text: "Weapon"
             Label:
+                id: weapon
                 text: "None"
             Label:
                 text: "Deck"
             Label:
+                id: deck
                 text: "44"
     AnchorLayout:
         anchor_x: "center"
@@ -36,13 +39,21 @@
             rows: 1
             cols: 4
             Button:
+                id: c1
                 text: "c1"
+                on_press: root.card(1)
             Button:
-                text: "c1"
+                id: c2
+                text: "c2"
+                on_press: root.card(2)
             Button:
-                text: "c1"
+                id: c3
+                text: "c3"
+                on_press: root.card(3)
             Button:
-                text: "c1"
+                id: c4
+                text: "c4"
+                on_press: root.card(4)
     AnchorLayout:
         anchor_x: "center"
         size_hint: 1, .1

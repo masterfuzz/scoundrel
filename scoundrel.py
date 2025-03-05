@@ -1,6 +1,8 @@
-from kivy.app import App
-# from kivy.uix.widget import Widget
+from kivy.app import App, ObjectProperty
+from kivy.uix.widget import Widget
+from kivy.uix.behaviors import button
 from kivy.uix.gridlayout import GridLayout
+from enum import Enum
 import random
 
 HEARTS = '♥'
@@ -9,7 +11,7 @@ SPADES = '♠'
 CLUBS = '♣'
 
 class Card:
-    suits = ['♥', '♦', '♠', '♣']
+    suits = [HEARTS, DIAMONDS, SPADES, CLUBS]
 
     def __init__(self, value, suit):
         self.value = value
@@ -34,6 +36,14 @@ def value_name(value):
 def new_deck():
     return [Card(v, s) for v in range(2,15) for s in Card.suits]
 
+class GameState(Enum):
+    START = 0
+    PICK_CARD = 1
+    CHOOSE_WEAPON = 2
+    TURN = 10
+    END = 20
+
+
 class Game:
     REMOVED_CARDS = [Card(v, s) for v in range(11,15) for s in ['♥', '♦']]
 
@@ -43,10 +53,13 @@ class Game:
         random.shuffle(self.deck)
 
         self.room = []
-        self.weapon = None
+        self.weapon: int | None = None
         self.last_monster = None
         self.health = 20
         self.has_run_already = False
+        self.monster_state: int | None = None
+
+        self.state = GameState.START
 
     def help(self):
         return f"""
@@ -70,106 +83,140 @@ class Game:
               """
 
     def start(self):
-        print(self.help())
-        if self.deal_room():
-            print()
-            print('congratulations! you cleared the dungeon!')
-        else:
-            print()
-            print('you have perished :(')
+        self.deal_room()
 
     def deal_room(self):
         if self.room:
             if len(self.deck) < 3:
-                return True
+                self.state = GameState.END
+                return
             self.room += [self.deck.pop(), self.deck.pop(), self.deck.pop()]
         else:
             self.room = [self.deck.pop(), self.deck.pop(), self.deck.pop(), self.deck.pop()]
-        return self.choose_from_room()
+        self.state = GameState.PICK_CARD
 
-    def show_room_choices(self):
-        print(" ".join(map(repr, self.room)))
-        print(f"HP: {self.health}/20")
-        if self.weapon:
-            print(f"Weapon: {self.weapon}{DIAMONDS} ({self.last_monster})")
-        print("Choose card or run")
+    # def show_room_choices(self):
+    #     print(" ".join(map(repr, self.room)))
+    #     print(f"HP: {self.health}/20")
+    #     if self.weapon:
+    #         print(f"Weapon: {self.weapon}{DIAMONDS} ({self.last_monster})")
+    #     print("Choose card or run")
 
     def run_from_room(self):
+        if self.state != GameState.PICK_CARD:
+            raise Exception("invalid game state")
+
         random.shuffle(self.room)
         self.deck = self.room + self.deck
         self.room = []
         self.has_run_already = True
-        return self.deal_room()
+        self.deal_room()
 
-    def choose_from_room(self):
-        self.show_room_choices()
-        choice = input('> ')
-        if not choice:
-            return self.choose_from_room()
-        if choice[0] == 'q':
-            return False
-        if choice[0] == 'r':
-            if self.has_run_already:
-                print("you already ran!")
-                return self.choose_from_room()
-            return self.run_from_room()
-        c = int(choice[0])
-        if c < 1 or c > 4:
-            print('invalid choice')
-            return self.choose_from_room()
-        card = self.room.pop(c - 1)
-        self.do_card(card)
+    def next_turn(self):
+        if self.state != GameState.TURN:
+            raise Exception(f"tried to go to next turn when game state is {self.state}")
         if self.health <= 0:
-            return False
+            self.state = GameState.END
+            return
+        if len(self.room) <= 1:
+            self.deal_room()
+            return
+        self.state = GameState.PICK_CARD
 
-        if len(self.room) == 1:
-            self.has_run_already = False
-            return self.deal_room()
-        return self.choose_from_room()
+    def choose_from_room(self, idx: int):
+        if self.state != GameState.PICK_CARD:
+            raise Exception(f"tried to pick card when state is {self.state}")
+        if idx < 1 or idx > len(self.room):
+            raise Exception(f"invalid choice {idx} from {self.room}")
+
+        card = self.room.pop(idx - 1)
+        self.do_card(card)
 
     def do_card(self, card: Card):
         print(f"you chose {card}")
         if card.suit == HEARTS:
             self.health = min(20, self.health + card.value)
             print("you healed")
+            self.state = GameState.TURN
             return
         if card.suit == DIAMONDS:
             print(f"you equiped {card}")
             self.weapon = card.value
             self.last_monster = None
+            self.state = GameState.TURN
             return
         # fight!
-        # TODO: choice
         if self.weapon and (self.last_monster is None or self.last_monster > card.value):
-            w = input('Fight with weapon? ')
-            if w == 'y':
-                self.fight_with_weapon(card.value)
-            else:
-                self.fight_with_fists(card.value)
+            self.monster_state = card.value
+            self.state = GameState.CHOOSE_WEAPON
         else:
             self.fight_with_fists(card.value)
 
-        # if self.weapon:
-        #     if self.last_monster is None:
-        #         self.fight_with_weapon(card.value)
-        #     elif self.last_monster > card.value:
-        #         self.fight_with_weapon(card.value)
-        #     self.fight_with_fists(card.value)
-        # else:
-        #     self.fight_with_fists(card.value)
 
-    def fight_with_weapon(self, value):
-        dmg = max(0, value - self.weapon)
+    def fight_with_weapon(self):
+        if self.monster_state is None or self.state != GameState.CHOOSE_WEAPON or self.weapon is None:
+            raise Exception(f"tried to fight with weapon. gamestate: {self.state} monster_state: {self.monster_state} weapon: {self.weapon}")
+
+        dmg = max(0, self.monster_state - self.weapon)
         print(f"you fight the monster with your weapon and take {dmg} damage!")
         self.health -= dmg
-        self.last_monster = value
+        self.last_monster = self.monster_state
+        self.state = GameState.TURN
+        self.monster_state = None
 
     def fight_with_fists(self, value):
         print(f"you fight the monster and take {value} damage!")
         self.health -= value
+        self.state = GameState.TURN
 
 class ScoundrelGame(GridLayout):
-    pass
+
+    def __init__(self):
+        super().__init__()
+        self.g = Game()
+        self.g.start()
+        self.cards = [self.ids[f"c{i}"] for i in range(1,5)]
+        self.transition()
+
+    def card(self, idx: int):
+        self.g.choose_from_room(idx)
+        self.transition()
+
+    def set_status_labels(self):
+        self.ids['health'].text = f"{self.g.health}/20"
+        self.ids['weapon'].text = f"{self.g.weapon}" if self.g.weapon else "None"
+        self.ids['deck'].text = f"{len(self.g.deck)}"
+
+    def transition(self):
+        match self.g.state:
+            case GameState.START:
+                print('start')
+                for i in range(len(self.g.room)):
+                    self.cards[i].disabled = False
+                    self.cards[i].text = repr(self.g.room[i])
+            case GameState.CHOOSE_WEAPON:
+                print('choose weapon')
+                # todo allow choice
+                self.g.fight_with_weapon()
+                self.transition()
+            case GameState.PICK_CARD:
+                print('pick card')
+                for c in self.cards:
+                    c.disabled = True
+                for i in range(len(self.g.room)):
+                    self.cards[i].disabled = False
+                    self.cards[i].text = repr(self.g.room[i])
+            case GameState.TURN:
+                print('turn')
+                self.set_status_labels()
+                # for now just call next turn and then transition
+                self.g.next_turn()
+                self.transition()
+
+            case GameState.END:
+                for i in range(4):
+                    self.cards[i].disabled = True
+                print('end')
 
 
 
