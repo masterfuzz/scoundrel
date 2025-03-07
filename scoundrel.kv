@@ -1,4 +1,5 @@
 #:kivy 1.4
+#:import Factory kivy.factory.Factory
 
 <ScoundrelGame>:    
     rows: 6
@@ -60,7 +61,40 @@
         Button:
             size_hint: .1, .5
             text: "Run!"
-    Label:
-        size_hint: None, .2
-        text: ""
+    AnchorLayout:
+        size_hint: 1, .2
+        anchor_x: "right"
+        Button:
+            size_hint: .1, 1
+            text: 'Help'
+            on_release: Factory.HelpPopup().open()
 
+<HelpPopup@Popup>:
+    auto_dismiss: False
+    title: "Scoundrel Help"
+    GridLayout:
+        rows: 2
+        cols: 1
+        Label:
+            text: app.help_text
+            size_hint: .8, .9
+
+        Button:
+            size_hint: .8, .1
+            text: 'Close'
+            on_release: root.dismiss()
+
+<GameEndPopup@Popup>:
+    auto_dismiss: False
+    title: "Game Over"
+    GridLayout:
+        rows: 2
+        cols: 1
+        Label:
+            text: "Game over"
+            size_hint: .8, .9
+
+        Button:
+            size_hint: .8, .1
+            text: 'Close'
+            on_release: root.dismiss()

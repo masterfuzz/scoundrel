@@ -57,8 +57,7 @@ class Game:
 
         self.state = GameState.START
 
-    def help(self):
-        return f"""
+    help_text = f"""
               == SCOUNDREL SOLITARE CARD GAME ==
               Each "room" of the dungeon you must select a card. Its behaviour matches its suit
               You start with 20 life and you must clear every room of the dungeon.

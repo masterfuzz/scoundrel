@@ -1,15 +1,15 @@
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.popup import Popup
 from scoundrel import Game, GameState
+from kivy.factory import Factory
 
 class ScoundrelGame(GridLayout):
 
     def __init__(self):
         super().__init__()
-        self.g = Game()
-        self.g.start()
         self.cards = [self.ids[f"c{i}"] for i in range(1,5)]
-        self.transition()
+        self.restart_game()
 
     def card(self, idx: int):
         self.g.choose_from_room(idx)
@@ -19,6 +19,11 @@ class ScoundrelGame(GridLayout):
         self.ids['health'].text = f"{self.g.health}/20"
         self.ids['weapon'].text = f"{self.g.weapon}" if self.g.weapon else "None"
         self.ids['deck'].text = f"{len(self.g.deck)}"
+
+    def restart_game(self):
+        self.g = Game()
+        self.g.start()
+        self.transition()
 
     def transition(self):
         match self.g.state:
@@ -50,12 +55,17 @@ class ScoundrelGame(GridLayout):
                 for i in range(4):
                     self.cards[i].disabled = True
                 print('end')
+                game_end_popup: Popup = Factory.GameEndPopup()
+                game_end_popup.bind(on_dismiss=(lambda _: self.restart_game()))
+                game_end_popup.open()
 
 
 
 class ScoundrelApp(App):
     def build(self):
         return ScoundrelGame()
+
+    help_text = Game.help_text
 
 
 if __name__ == '__main__':
