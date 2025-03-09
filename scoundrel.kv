@@ -28,7 +28,7 @@
                 id: weapon
                 text: "None"
             Label:
-                text: "Deck"
+                text: "Cards Remaining"
             Label:
                 id: deck
                 text: "44"
@@ -89,8 +89,13 @@
             rows: 3
             cols: 2
             size_hint: .8, .4
-            Image:
-                source: "images/cards/card-clubs-2.png"
+            GridLayout:
+                rows: 1
+                cols: 2
+                Image:
+                    source: "images/cards/card-clubs-2.png"
+                Image:
+                    source: "images/cards/card-spades-2.png"
             Label:
                 text: "Clubs/Spades: A monster! If you attack it, it will deal its value in damage to you"
             Image:

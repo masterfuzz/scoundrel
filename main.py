@@ -12,6 +12,9 @@ class ScoundrelGame(GridLayout):
         super().__init__()
         self.cards: list[Image] = [self.ids[f"c{i}"] for i in range(1,5)]
         self.run_button = self.ids["run_away"]
+        self.weapon_label = self.ids["weapon"]
+        self.health_label = self.ids["health"]
+        self.deck_label = self.ids["deck"]
         self.restart_game()
 
     def card(self, idx: int):
@@ -23,9 +26,13 @@ class ScoundrelGame(GridLayout):
         self.transition()
 
     def set_status_labels(self):
-        self.ids['health'].text = f"{self.g.health}/20"
-        self.ids['weapon'].text = f"{self.g.weapon}" if self.g.weapon else "None"
-        self.ids['deck'].text = f"{len(self.g.deck)}"
+        self.health_label.text = f"{max(0, self.g.health)}/20"
+        if self.g.weapon:
+            if self.g.last_monster:
+                self.weapon_label.text = f"{self.g.weapon} ({self.g.last_monster})"
+            else:
+                self.weapon_label.text = f"{self.g.weapon}"
+        self.deck_label.text = f"{len(self.g.deck)}"
 
     def restart_game(self):
         self.g = Game()
@@ -50,6 +57,7 @@ class ScoundrelGame(GridLayout):
                 self.transition()
             case GameState.PICK_CARD:
                 print('pick card')
+                self.set_status_labels()
                 self.run_button.disabled = not self.g.can_run()
                 for c in self.cards:
                     c.disabled = True

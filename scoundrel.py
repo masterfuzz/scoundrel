@@ -104,13 +104,6 @@ class Game:
             self.room = [self.deck.pop(), self.deck.pop(), self.deck.pop(), self.deck.pop()]
         self.state = GameState.PICK_CARD
 
-    # def show_room_choices(self):
-    #     print(" ".join(map(repr, self.room)))
-    #     print(f"HP: {self.health}/20")
-    #     if self.weapon:
-    #         print(f"Weapon: {self.weapon}{DIAMONDS} ({self.last_monster})")
-    #     print("Choose card or run")
-
     def run_from_room(self):
         if self.state != GameState.PICK_CARD or self.has_run_already:
             raise Exception("invalid game state")
