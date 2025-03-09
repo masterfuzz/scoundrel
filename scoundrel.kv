@@ -76,12 +76,38 @@
     auto_dismiss: False
     title: "Scoundrel Help"
     GridLayout:
-        rows: 2
+        rows: 7
         cols: 1
         Label:
-            text: app.help_text
-            size_hint: .8, .9
-
+            text: "SCOUNDREL SOLITARE CARD GAME"
+            font_size: 40
+            size_hint: .8, .1
+        Label:
+            text: 'Each "room" of the dungeon you must select a card.\nIts behaviour matches its suit You start with 20 life and you must clear every room of the dungeon.'
+            size_hint: .8, .1
+        GridLayout:
+            rows: 3
+            cols: 2
+            size_hint: .8, .4
+            Image:
+                source: "images/cards/card-clubs-2.png"
+            Label:
+                text: "Clubs/Spades: A monster! If you attack it, it will deal its value in damage to you"
+            Image:
+                source: "images/cards/card-hearts-2.png"
+            Label:
+                text: "Hearts: A health potion! You'll immediately heal its value"
+            Image:
+                source: "images/cards/card-diamonds-2.png"
+            Label:
+                text: "Diamonds: A weapon! You'll equip this weapon (replacing any existing one)"
+        Label:
+            size_hint: .8, .15
+            text: "When you choose to fight with your weapon, you subtract its value from the monster's damage.\nHowever, you can only use the weapon to fight monsters which are weaker than the last monster you fought with that weapon."
+        Label:
+            size_hint: .8, .15
+            text: "You can choose to run from a room, placing the room cards on the bottom of the deck and drawing four new ones.\nYou cannot run twice in a row!"
+                
         Button:
             size_hint: .8, .1
             text: 'Close'
