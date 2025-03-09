@@ -11,10 +11,15 @@ class ScoundrelGame(GridLayout):
     def __init__(self):
         super().__init__()
         self.cards: list[Image] = [self.ids[f"c{i}"] for i in range(1,5)]
+        self.run_button = self.ids["run_away"]
         self.restart_game()
 
     def card(self, idx: int):
         self.g.choose_from_room(idx)
+        self.transition()
+
+    def run_away(self):
+        self.g.run_from_room()
         self.transition()
 
     def set_status_labels(self):
@@ -45,6 +50,7 @@ class ScoundrelGame(GridLayout):
                 self.transition()
             case GameState.PICK_CARD:
                 print('pick card')
+                self.run_button.disabled = not self.g.can_run()
                 for c in self.cards:
                     c.disabled = True
                     c.source = "./images/cards/card-blank.png"

@@ -99,6 +99,7 @@ class Game:
                 self.state = GameState.END
                 return
             self.room += [self.deck.pop(), self.deck.pop(), self.deck.pop()]
+            self.has_run_already = False
         else:
             self.room = [self.deck.pop(), self.deck.pop(), self.deck.pop(), self.deck.pop()]
         self.state = GameState.PICK_CARD
@@ -111,7 +112,7 @@ class Game:
     #     print("Choose card or run")
 
     def run_from_room(self):
-        if self.state != GameState.PICK_CARD:
+        if self.state != GameState.PICK_CARD or self.has_run_already:
             raise Exception("invalid game state")
 
         random.shuffle(self.room)
@@ -177,3 +178,5 @@ class Game:
         self.health -= value
         self.state = GameState.TURN
 
+    def can_run(self):
+        return len(self.room) == 4 and not self.has_run_already

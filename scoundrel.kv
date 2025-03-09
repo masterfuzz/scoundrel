@@ -55,8 +55,10 @@
         anchor_x: "center"
         size_hint: 1, .1
         Button:
+            id: run_away
             size_hint: .1, .5
             text: "Run!"
+            on_press: root.run_away()
     AnchorLayout:
         size_hint: 1, .2
         anchor_x: "right"
