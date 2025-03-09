@@ -36,24 +36,20 @@
         anchor_x: "center"
         size_hint: 1, .5
         GridLayout:
-            size_hint: .5, .8
+            size_hint: .6, .8
             rows: 1
             cols: 4
-            Button:
+            CardButton:
                 id: c1
-                text: "c1"
                 on_press: root.card(1)
-            Button:
+            CardButton:
                 id: c2
-                text: "c2"
                 on_press: root.card(2)
-            Button:
+            CardButton:
                 id: c3
-                text: "c3"
                 on_press: root.card(3)
-            Button:
+            CardButton:
                 id: c4
-                text: "c4"
                 on_press: root.card(4)
     AnchorLayout:
         anchor_x: "center"
@@ -68,6 +64,11 @@
             size_hint: .1, 1
             text: 'Help'
             on_release: Factory.HelpPopup().open()
+
+
+<CardButton@ButtonBehavior+Image>
+    allow_stretch: True
+    source: "images/cards/card-back1.png"
 
 <HelpPopup@Popup>:
     auto_dismiss: False

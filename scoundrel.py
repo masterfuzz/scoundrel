@@ -6,6 +6,13 @@ DIAMONDS = '♦'
 SPADES = '♠'
 CLUBS = '♣'
 
+SUIT_NAMES = {
+    HEARTS: 'hearts',
+    DIAMONDS: 'diamonds',
+    SPADES: 'spades',
+    CLUBS: 'clubs',
+}
+
 class Card:
     suits = [HEARTS, DIAMONDS, SPADES, CLUBS]
 
@@ -13,21 +20,27 @@ class Card:
         self.value = value
         self.suit = suit
 
+    def suit_name(self):
+        return SUIT_NAMES[self.suit]
+
     def __repr__(self):
         return f"{value_name(self.value)}{self.suit}"
 
     def __eq__(self, o):
         return o.suit == self.suit and o.value == self.value
 
-def value_name(value):
+def value_name(value, long=False):
     if value < 11:
         return str(value)
-    return {
-        11: 'J',
-        12: 'Q',
-        13: 'K',
-        14: 'A',
+    name = {
+        11: 'jack',
+        12: 'queen',
+        13: 'king',
+        14: 'ace',
     }[value]
+    if long:
+        return name
+    return name[0].upper()
 
 def new_deck():
     return [Card(v, s) for v in range(2,15) for s in Card.suits]

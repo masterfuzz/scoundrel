@@ -1,14 +1,16 @@
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
-from scoundrel import Game, GameState
+from scoundrel import Card, Game, GameState
 from kivy.factory import Factory
+from kivy.uix.image import Image
+
 
 class ScoundrelGame(GridLayout):
 
     def __init__(self):
         super().__init__()
-        self.cards = [self.ids[f"c{i}"] for i in range(1,5)]
+        self.cards: list[Image] = [self.ids[f"c{i}"] for i in range(1,5)]
         self.restart_game()
 
     def card(self, idx: int):
@@ -25,13 +27,17 @@ class ScoundrelGame(GridLayout):
         self.g.start()
         self.transition()
 
+    def card_image(self, card: Card):
+        value = (card.value - 1) % 13 + 1
+        return f"./images/cards/card-{card.suit_name()}-{value}.png"
+
     def transition(self):
         match self.g.state:
             case GameState.START:
                 print('start')
                 for i in range(len(self.g.room)):
                     self.cards[i].disabled = False
-                    self.cards[i].text = repr(self.g.room[i])
+                    self.cards[i].source = self.card_image(self.g.room[i])
             case GameState.CHOOSE_WEAPON:
                 print('choose weapon')
                 # todo allow choice
@@ -41,9 +47,11 @@ class ScoundrelGame(GridLayout):
                 print('pick card')
                 for c in self.cards:
                     c.disabled = True
+                    c.source = "./images/cards/card-blank.png"
                 for i in range(len(self.g.room)):
                     self.cards[i].disabled = False
-                    self.cards[i].text = repr(self.g.room[i])
+                    self.cards[i].source = self.card_image(self.g.room[i])
+                    # self.cards[i].text = repr(self.g.room[i])
             case GameState.TURN:
                 print('turn')
                 self.set_status_labels()
