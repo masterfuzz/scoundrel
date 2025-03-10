@@ -1,9 +1,11 @@
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.popup import Popup
-from scoundrel import Card, Game, GameState
+from scoundrel import DIAMONDS, Card, Game, GameState
 from kivy.factory import Factory
 from kivy.uix.image import Image
+from kivy.uix.button import Button
+from kivy.uix.label import Label
 
 
 class ScoundrelGame(GridLayout):
@@ -11,10 +13,11 @@ class ScoundrelGame(GridLayout):
     def __init__(self):
         super().__init__()
         self.cards: list[Image] = [self.ids[f"c{i}"] for i in range(1,5)]
-        self.run_button = self.ids["run_away"]
-        self.weapon_label = self.ids["weapon"]
-        self.health_label = self.ids["health"]
-        self.deck_label = self.ids["deck"]
+        self.run_button: Button = self.ids["run_away"]
+        self.weapon_image: Image = self.ids["weapon"]
+        self.last_monster_image: Image = self.ids["last_monster"]
+        self.health_label: Label = self.ids["health"]
+        self.deck_label: Label = self.ids["deck"]
         self.restart_game()
 
     def card(self, idx: int):
@@ -28,10 +31,14 @@ class ScoundrelGame(GridLayout):
     def set_status_labels(self):
         self.health_label.text = f"{max(0, self.g.health)}/20"
         if self.g.weapon:
+            self.weapon_image.source = self.card_image(Card(self.g.weapon, DIAMONDS))
             if self.g.last_monster:
-                self.weapon_label.text = f"{self.g.weapon} ({self.g.last_monster})"
+                self.last_monster_image.source = self.card_image(self.g.last_monster)
             else:
-                self.weapon_label.text = f"{self.g.weapon}"
+                self.last_monster_image.source = "images/cards/card-blank.png"
+        else:
+            self.weapon_image.source = "images/cards/card-blank.png"
+            self.last_monster_image.source = "images/cards/card-blank.png"
         self.deck_label.text = f"{len(self.g.deck)}"
 
     def restart_game(self):

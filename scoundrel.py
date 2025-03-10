@@ -63,10 +63,10 @@ class Game:
 
         self.room = []
         self.weapon: int | None = None
-        self.last_monster = None
+        self.last_monster: Card | None = None
         self.health = 20
         self.has_run_already = False
-        self.monster_state: int | None = None
+        self.monster_state: Card | None = None
 
         self.state = GameState.START
 
@@ -148,8 +148,8 @@ class Game:
             self.state = GameState.TURN
             return
         # fight!
-        if self.weapon and (self.last_monster is None or self.last_monster > card.value):
-            self.monster_state = card.value
+        if self.weapon and (self.last_monster is None or self.last_monster.value > card.value):
+            self.monster_state = card
             self.state = GameState.CHOOSE_WEAPON
         else:
             self.fight_with_fists(card.value)
@@ -159,7 +159,7 @@ class Game:
         if self.monster_state is None or self.state != GameState.CHOOSE_WEAPON or self.weapon is None:
             raise Exception(f"tried to fight with weapon. gamestate: {self.state} monster_state: {self.monster_state} weapon: {self.weapon}")
 
-        dmg = max(0, self.monster_state - self.weapon)
+        dmg = max(0, self.monster_state.value - self.weapon)
         print(f"you fight the monster with your weapon and take {dmg} damage!")
         self.health -= dmg
         self.last_monster = self.monster_state
